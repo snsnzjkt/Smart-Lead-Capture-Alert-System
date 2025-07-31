@@ -1,0 +1,408 @@
+{
+  "name": "Test Task - Edrine",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/tally-form",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -208
+      ],
+      "id": "35812d7a-6933-4cdf-8e85-125aa9137656",
+      "name": "Webhook",
+      "webhookId": "3757d322-b8aa-4292-84a5-7f62dc16f733"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad3fcb44-c29c-47ec-9bbc-5fc776366292",
+              "name": "First Name",
+              "value": "={{ $json.body.data.fields[0].value }}",
+              "type": "string"
+            },
+            {
+              "id": "d1c7ee23-425d-4dcd-9f6e-684788fc5fae",
+              "name": "Last Name",
+              "value": "={{ $json.body.data.fields[1].value }}",
+              "type": "string"
+            },
+            {
+              "id": "e8d44ba0-a9c6-4a9e-9b06-d5980902a65d",
+              "name": "Email",
+              "value": "={{ $json.body.data.fields[2].value }}",
+              "type": "string"
+            },
+            {
+              "id": "cceda20d-a110-47c2-983b-4ed7dbe71b48",
+              "name": "Phone",
+              "value": "={{ $json.body.data.fields[3].value }}",
+              "type": "string"
+            },
+            {
+              "id": "f9f70173-1918-49b6-9237-f6f6d0539c93",
+              "name": "Notes",
+              "value": "={{ $json.body.data.fields[4].value }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        -208
+      ],
+      "id": "d3ee71cf-398e-4399-bc07-20957d04170e",
+      "name": "Information Parser"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "tableId": "form_submissions",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "first_name",
+              "fieldValue": "={{ $('Information Parser').item.json['First Name'] }}"
+            },
+            {
+              "fieldId": "last_name",
+              "fieldValue": "={{ $('Information Parser').item.json['Last Name'] }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Information Parser').item.json.Email }}"
+            },
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $('Information Parser').item.json.Phone }}"
+            },
+            {
+              "fieldId": "notes",
+              "fieldValue": "={{ $('Information Parser').item.json.Notes }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        -336
+      ],
+      "id": "77d5307f-199f-4cf4-8570-aa8e1cb328ef",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pzTVoVE8N2zBeDdX",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C097P6BLZ61",
+          "mode": "list",
+          "cachedResultName": "test-task-slack"
+        },
+        "text": "=🆕 *New Form Submission*  \nName: {{ $('Information Parser').item.json['First Name'] }} {{ $('Information Parser').item.json['Last Name'] }} \nEmail: {{ $('Information Parser').item.json.Email }} \nPhone: {{ $('Information Parser').item.json.Phone }}  \nMessage:{{ $('Information Parser').item.json.Notes }}  \n\nSubmitted: {{ $now }}  \n-------\n",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1312,
+        -336
+      ],
+      "id": "cadcc9fc-a722-49d6-8d7c-7ea41c9c6328",
+      "name": "Send a message",
+      "webhookId": "5e0c2b16-2cd3-4a11-a442-f2c9b9105344",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "zzg5r0KlfV8ejsCn",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "edrineesguerra4@gmail.com",
+        "subject": "New Form Submission",
+        "message": "=<h3>New Form Submission Received</h3> <p><strong>Note:</strong> Slack notification failed, sending via email instead.</p>  <ul>   <li><strong>Name:</strong> {{ $json.first_name }} {{ $json.last_name }}</li>   <li><strong>Email:</strong> {{ $json.email }}</li>   <li><strong>Phone:</strong> {{ $json.phone_number }}</li>   <li><strong>Notes:</strong> {{ $json.notes }}</li> </ul>  <p><strong>Submitted at:</strong></p> <p>{{ $json.created_at }}</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1648,
+        -224
+      ],
+      "id": "bbc9aa57-a126-4347-bc03-29c4d2d3581d",
+      "name": "Send to Gmail",
+      "webhookId": "686cf20c-aa12-4fb0-a4aa-8fcb840122b3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HyyRrc5DgJKWGPJQ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c4e54390-6a4d-458e-8295-a08d31e1ba81",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        -336
+      ],
+      "id": "f514cf2b-8674-4d5e-a587-a4cd2db18902",
+      "name": "Fallback"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5dbd0b57-6f47-4429-a77e-5d80fe701955",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        -208
+      ],
+      "id": "e8f092c8-1d0c-43e3-9f83-36d9d2d099b8",
+      "name": "If",
+      "notesInFlow": true,
+      "notes": "Check for Duplicates"
+    },
+    {
+      "parameters": {
+        "content": "GMail Fallback",
+        "height": 192,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1616,
+        -256
+      ],
+      "typeVersion": 1,
+      "id": "13fb8e34-a00f-40b0-8b6e-4968a530aa62",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Send a Slack Alert",
+        "height": 208,
+        "width": 448,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1136,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "2d703a85-92c2-4b58-89fc-8f06f399c39a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Parse & Validate",
+        "height": 208,
+        "width": 304,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        624,
+        -256
+      ],
+      "typeVersion": 1,
+      "id": "6a02e7c4-98b9-45d0-aa57-f00a26bfde90",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "form_submissions",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.Email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -208
+      ],
+      "id": "a9c1c255-aec0-4926-8dcd-66d3186b9a3c",
+      "name": "Get many rows",
+      "retryOnFail": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pzTVoVE8N2zBeDdX",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Information Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Parser": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fallback": {
+      "main": [
+        [
+          {
+            "node": "Send to Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "421a4b41-7709-4962-8204-2518a0faf72b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe9657fcdad7403c7a2df66b133cff5e03b560cc001c1603d516b4bcb4ec7f39"
+  },
+  "id": "VAJhemHNFRg9JzA0",
+  "tags": []
+}
